@@ -1,0 +1,9 @@
+Haoyang Fan
+445402
+Meng Li
+447788
+
+ec2-54-161-94-127.compute-1.amazonaws.com/~hyfan/login.html
+
+Rename files on the server;
+Distribute files.

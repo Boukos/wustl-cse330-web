@@ -1,0 +1,20 @@
+
+body {background-color: #89CFF0;}
+
+img.displayed {
+	display: block;
+	margin-left: auto;
+	margin-right: auto }
+	
+h1 {
+	line-height: 10px;
+	text-align:center;
+	text-shadow: 2px 2px red;
+	color:purple;
+	font-family:Times,Arial;
+	font-size:60pt;
+	}
+h1.b {font-weight:bold;}
+h1.i {
+	font-style:italic;
+	font-size:100pt;}
