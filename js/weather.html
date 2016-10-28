@@ -1,0 +1,42 @@
+<!DOCTYPE html>	
+<html>	
+<head>
+	<meta charset="utf-8"/>
+	<title>js weather</title>
+	<link rel="stylesheet" type="text/css" href="weather.css">
+	
+<script>
+	function fetchWeather(){
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.open("POST", "http://classes.engineering.wustl.edu/cse330/content/weather_json.php", true);
+		xmlHttp.addEventListener("load", ajaxCallback, false);
+		xmlHttp.send(null);
+	}
+	
+	function ajaxCallback(event){
+		var jsonData = JSON.parse(event.target.responseText);
+		document.getElementsByClassName("weather-loc")[0].textContent = jsonData.location.city+" "+jsonData.location.state;
+		document.getElementsByClassName("weather-humidity")[0].textContent = jsonData.atmosphere.humidity;
+		document.getElementsByClassName("weather-temp")[0].textContent = jsonData.current.temp;
+		document.getElementsByClassName("weather-tomorrow")[0].src = "http://us.yimg.com/i/us/nws/weather/gr/"+jsonData.tomorrow.code+"ds.png";
+		document.getElementsByClassName("weather-dayaftertomorrow")[0].src = "http://us.yimg.com/i/us/nws/weather/gr/"+jsonData.dayafter.code+"ds.png";
+	}
+	
+	document.addEventListener("DOMContentLoaded", fetchWeather, false);
+	
+</script>
+	
+</head>
+
+<body>
+
+	<div class="weather" id="weatherWidget">
+		<div class="weather-loc"></div>
+		<div class="weather-humidity"></div>
+		<div class="weather-temp"></div>
+		<img class="weather-tomorrow" />
+		<img class="weather-dayaftertomorrow" />
+	</div>
+	
+</body>
+</html>
