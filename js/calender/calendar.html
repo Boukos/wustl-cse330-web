@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Calendar</title>
+        <link rel="stylesheet" type="text/css" href="calendar.css"/>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+        <script type="text/javascript" src="constant.js"> </script>
+		<script type="text/javascript" src="calendar.js"> </script>
+    </head>
+    <body>
+        <div id="login">
+			Welcome, guest.
+            <input type="text" id="username" />
+            <input type="password" id="password" />
+            <input value="login" type="submit" id="loginbtn" />
+            <input value="register" type="submit" id="register" />
+        </div>
+		<div id="logout">
+			Welcome!<span id="currentUser"></span>
+			<input value="logout" type="submit" id="logoutbtn" />
+		</div>
+		<!--
+        <header>
+            <h1>Calendar</h1>
+        </header>
+		-->
+        <div id="main">
+            <div id="calendar-head">
+                <button id="prevMonthBtn">Prev</button>
+                <span id="calendar-month">2016-10</span>
+                <button id="nextMonthBtn">Next</button>
+            </div>
+            <div id="tag-toggle">
+                <!-- <input type="checkbox" value="1">Default -->
+            </div>
+            <div id="wrapper"></div>
+        </div>
+		
+        <div id="detail-panel">            
+            <div id="detail-header">
+               2016-10-31
+            </div>
+            <div id="detail-body">
+                <div id="event-list"></div>
+                <div id="add-event">
+                    <form>
+                        <div><label>Time</label>&nbsp;<input type ="number" id="hrs" min="0" max="23">&nbsp;:&nbsp;<input type ="number" id="mins" min="0" max="59"></div>
+                        <div><label>Event</label>&nbsp;<input type = "text" value = "" class = "listened" id = "content"></div>
+                        <div><label>Tag</label>&nbsp;
+                            <select id="event-tag-select">
+                            </select>
+
+                        </div>
+                        <input value="Add" type="button" id="addEventBtn" />
+                    </form>
+                </div>
+            </div>
+            <div id="detail-footer">
+            </div>
+        </div>
+
+    </body>
+</html>

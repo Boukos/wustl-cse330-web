@@ -15,15 +15,21 @@
 	
 	function ajaxCallback(event){
 		var jsonData = JSON.parse(event.target.responseText);
-		document.getElementsByClassName("weather-loc")[0].textContent = jsonData.location.city+" "+jsonData.location.state;
+		document.getElementsByClassName("weather-loc")[0].innerHTML = "<strong>"+jsonData.location.city+"</strong> "+jsonData.location.state
 		document.getElementsByClassName("weather-humidity")[0].textContent = jsonData.atmosphere.humidity;
 		document.getElementsByClassName("weather-temp")[0].textContent = jsonData.current.temp;
 		document.getElementsByClassName("weather-tomorrow")[0].src = "http://us.yimg.com/i/us/nws/weather/gr/"+jsonData.tomorrow.code+"ds.png";
 		document.getElementsByClassName("weather-dayaftertomorrow")[0].src = "http://us.yimg.com/i/us/nws/weather/gr/"+jsonData.dayafter.code+"ds.png";
 	}
 	
-	document.addEventListener("DOMContentLoaded", fetchWeather, false);
+	function refreshButton(){
+		document.getElementById("button").addEventListener("click", fetchWeather, false);
+		
+	}
 	
+	document.addEventListener("DOMContentLoaded", fetchWeather, false);
+	document.addEventListener("DOMContentLoaded", refreshButton, false);
+		
 </script>
 	
 </head>
@@ -36,6 +42,9 @@
 		<div class="weather-temp"></div>
 		<img class="weather-tomorrow" />
 		<img class="weather-dayaftertomorrow" />
+	</div>
+	<div id="button">
+		<button type="button">Refresh</button>
 	</div>
 	
 </body>
