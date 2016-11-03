@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 if(empty($_SESSION))
 {
 	session_start();
@@ -14,9 +15,12 @@ if(empty($_SESSION))
 include 'function.php';
 header("Content-Type: application/json");
 
-// if(!isset($_SESSION['username'])){
-// 	exit;
-// }
+if(!isset($_SESSION['username'])){
+	echo json_encode(array(
+ 		"success"=>false,
+ 		"message"=>"No permission"));
+ 	exit;
+}
 
 
 if(isset($_POST['event_id'])){

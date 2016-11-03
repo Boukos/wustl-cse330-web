@@ -1,0 +1,142 @@
+header{
+    border-bottom: solid 1px #000;
+    position: relative;
+    left: 0;
+    top: 0;
+    height: 50px;
+    width: 100%;
+    padding: 0;
+}
+
+header input{
+    position: absolute;
+    right: 0;
+}
+
+#main{
+    float: left;
+}
+
+#calendar-head{
+    text-align: center;
+	padding: 10px 2px;
+    width: 700px;
+    background: #1abc9c;
+}
+
+#calendar-head span{
+	color: white;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+#calendar-head button{
+	background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+#calendar-head #calendar-month{
+    font-size: 30px;
+}
+
+#wrapper{
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    width: 700px;
+    min-height: 300px;
+	
+	//border: 2px solid black;
+	vertical-align: top;
+	text-align: center;
+
+    background: #eee;
+}
+
+th, td {
+	border: 2px solid black;
+	vertical-align: top;
+	text-align: center;
+	height: 40px;
+    width: 100px;
+    //background: #eee;
+} 
+
+#add-event-div{
+	text-align: center;
+	padding: 10px 2px;
+    width: 700px;
+	min-height: 25px;
+    background: #1abc9c;
+	//background: #999;
+}
+
+#add-event span{
+	color: white;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#add-event input[type=number]{
+	width = 20px;
+}
+
+#add-event #addEventBtn{
+	background-color: #4CAF50; /* Green */
+    //border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+}
+
+#add-event #shareEventBtn{
+	//background-color: #4CAF50; /* Green */
+    border: none;
+    //color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+}
+
+#add-event #sharedUser{
+	width: 50px;
+}
+
+#detail-panel{
+    /*display: none;*/
+    min-height: 440px;
+    width: 300px;
+    background: #efefef;
+    /*border: solid 1px #000;*/
+    float: left;
+    padding: 5px;
+    /*position: fixed;*/
+}
+
+#detail-panel .event{
+    margin: 5px 0;
+    border-bottom: solid 1px #ccc;
+    position: relative;
+}
+
+#detail-panel .event .event-action{
+    position: absolute;
+    display: inline-block;
+    right: 0;
+    bottom: 0;
+}
+
+#tag-toggle{
+    width: 700px;
+}

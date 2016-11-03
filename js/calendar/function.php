@@ -12,7 +12,6 @@ function connectDB(){
 	}
 	return $mysqli;}
 
-//reset auto increment
 function resetUsersAutoIncrement(){
 	$mysqli = connectDB();
 	$query = "ALTER TABLE users AUTO_INCREMENT = 1";
@@ -37,7 +36,7 @@ function resetEventsAutoIncrement(){
 	$result->execute();
 	$result->close();}
 
-//regular expression check
+//regex
 function usernameCheck($user){
 	if (!preg_match('/^[\w_\-]+$/', $user)) {
         return "Invalid username";
@@ -63,7 +62,7 @@ function timestampCheck($timestamp){
     $timestamp = htmlspecialchars($timestamp);
     return $timestamp;}
 
-//User part
+//User
 function addUser($user, $pwd) {
     $user =  usernameCheck($user);
     if ($user == "Invalid username"){
@@ -103,6 +102,25 @@ function addUser($user, $pwd) {
 	}
 	$result->close();
 	return "success";}
+
+function checkUser($user){
+	$mysqli = connectDB();
+	$query = "SELECT username FROM users where username = '$user'";
+	$result = $mysqli->prepare($query);
+
+	if(!$result) {
+		die("Select Query Prep Failed 1: ".$mysqli->error);
+		return "Query Fail";
+	}
+
+	$result->execute();
+	if($result->fetch()) {
+		return true;
+	}
+	else{
+		return false;
+	}
+}
 	
 function getUserId($username){
 	$mysqli = connectDB();
@@ -155,7 +173,8 @@ function login($user, $pwd) {
 		return "Incorrect username or password";
 	}}
 
-//event part
+// Event
+// Edit
 function addEvent($user_id,$content,$timestamp,$tag_id){
 	$content = textCheck($content);
 	if($content == "Invalid Text" ){return "Invalid Content";}
@@ -192,7 +211,7 @@ function deleteEvent($event_id){
 	$result->execute();
 	$result->close();
 	
-	return "success";
+	return "Success";
 }
 
 function addSharedEvent($event_id, $owner_id, $self_id){
@@ -219,8 +238,8 @@ function addSharedEvent($event_id, $owner_id, $self_id){
 	return "success";
 }
 
-
-
+// Get 
+#echo date("Y-m-d")."<br>".date("h:i:s");
 function getEvents($user_id){
 	$mysqli = connectDB();
 	$query = "SELECT event_id ,content ,timestamp, tag_id FROM events  WHERE user_id=$user_id ORDER BY timestamp DESC";
@@ -239,9 +258,26 @@ function getEvents($user_id){
 		array_push($events, $temp);
 	}
 	$result->close();
+	
+	// group events
+	$query = "SELECT event_id ,content ,timestamp, tag_id FROM events  WHERE tag_id=6 ORDER BY timestamp DESC";
+	$result = $mysqli->prepare($query);
+
+	if(!$result) {
+		die("Query Prep Failed: ".$mysqli->error);
+	}
+
+	$result->execute();
+	$result->bind_result($event_id,$content,$timestamp,$tag);
+	while($result->fetch()){
+		$temp = array();
+		array_push($temp, $event_id,$content,$timestamp,$tag);
+		array_push($events, $temp);
+	}
+	$result->close();
+	
 	return $events;
 }
-
 
 function getTags(){
 	$mysqli = connectDB();
@@ -264,6 +300,5 @@ function getTags(){
 	return $tags;
 }
 
-#echo date("Y-m-d")."<br>".date("h:i:s");
 
 ?>

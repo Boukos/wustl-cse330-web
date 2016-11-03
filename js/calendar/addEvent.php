@@ -20,7 +20,7 @@ header("Content-Type: application/json");
 if(!isset($_SESSION['username'])){
 	echo json_encode(array(
 		"success"=>false,
-		"message"=>"No username.."));
+		"message"=>"No permission"));
 	exit;
 }
 
@@ -31,22 +31,16 @@ $tag_id = $_POST['tag_id'];
 
 $user_id = getUserId($username);
 
-//$addEventResult = addEvent($user_id,$content,$timestamp,$tag_id);
-if(addEvent($user_id,$content,$timestamp,$tag_id)!='Success') {
-	echo json_encode(
-		array(
+$addEventResult = addEvent($user_id,$content,$timestamp,$tag_id);
+if($addEventResult!='Success') {
+	echo json_encode(array(
 			"success"=>false,
-			"message"=>"failed"
-		)
-	);
+			"message"=>$addEventResult));
 }
 else{
-	echo json_encode(
-		array(
+	echo json_encode(array(
 			"success"=>true,
-			"message"=>"succeeded"
-		)
-	);
+			"message"=>"success"));
 }
 
 exit;
