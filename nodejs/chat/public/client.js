@@ -1,5 +1,7 @@
 var socketio = io.connect();
+
 var username = null;
+var selectedsuser = null;
 
 // event listeners
 $(document).ready(function(){
@@ -25,36 +27,55 @@ $(document).ready(function(){
 		socketio.emit("createroom", {"room":roomname,"pwd":password});
 		$('#text_input').val("");
 		$('#password_input').val("");
+		
+		selectedsuser = null;
+		$('#selecteduser').text('user');
 	});
 	
 	// join chatroom
 	$(document).on('click', '.chatroomitem',function(){
 		var roomname = $(this).text();
+		
 		socketio.emit("joinroom", roomname);
+		
+		selectedsuser = null;
+		$('#selecteduser').text('user');
 	});
 	
 	$(document).on('click', '.roomuseritem',function(){
-		var username = $(this).text();
-		var mes = $('#text_input').val();
-		socketio.emit("whisperto", {user:username, message:mes});
+		var clickeduser = $(this).text();
+		selecteduser = clickeduser; //console.log(clickeduser);
+		$('#selecteduser').text(clickeduser);
+		
 	});
 	
 	$(document).on('click', '.mutebutton',function(){
 		var roomname = $(this).roomname();
 		var username = $(this).username();
-		socketio.emit("muteuser", {room:roomname, user:username});
+		socketio.emit("muteuser", {'room':roomname, 'user':username});
 	});
 	
-	$(document).on('click', '.kickbutton',function(){
-		var roomname = $(this).roomname();
-		var username = $(this).username();
-		socketio.emit("kickuser", {room:roomname, user:username});
+	$(document).on('click', '#whispbutton',function(){
+		//var roomname = $(this).roomname();
+		//var username = $(this).username();
+		//username = selectedsuser;
+		var whisptouser = $('#selecteduser').text();
+		
+		//var mes = $('#text_input').val();
+		var mes = prompt("whisper to "+whisptouser+": ");
+		if (mes !== null){
+			socketio.emit("whisperto", {'user':whisptouser, 'message':mes});
+		}
 	});
 	
-	$(document).on('click', '.banbutton',function(){
-		var roomname = $(this).roomname();
-		var username = $(this).username();
-		socketio.emit("banuser", {room:roomname, user:username});
+	$(document).on('click', '#kickbutton',function(){
+		var kickedusername = $('#selecteduser').text();
+		socketio.emit("kickuser", kickedusername);
+	});
+	
+	$(document).on('click', '#banbutton',function(){
+		var bannedusername = $('#selecteduser').text();
+		socketio.emit("banuser", bannedusername);
 	});
 });
 
@@ -94,20 +115,37 @@ socketio.on("roomusers", function(users){
 	var $table = $('<table></table>');
 	var arrayLength = users.length;
 	
-	var $bm = $('<button></button> ').text('mute');
-	$bm.addClass("mutebutton");
+	var $bm = $('<button></button> ').text('whisp');
+	$bm.attr("id","whispbutton");
 	var $bk = $('<button></button> ').text('kick');
-	$bk.addClass("kickbutton");
+	$bk.attr("id","kickbutton");
 	var $bb = $('<button></button> ').text('ban');
-	$bk.addClass("banbutton");
+	$bb.attr("id","banbutton");
 	
 	for (var i = 0; i < arrayLength; i++) {
 		var $t = $('<tr></tr>').text(users[i]); //t.text = key;
 		$t.addClass("roomuseritem");
-		$t.append($bm,$bk,$bb);
+		//$t.append($bm,$bk,$bb);
 		$table.append($t);
 	}
 	$('#roomuserslist').append($table);
+	$('#roomuserslist').append($bm,$bk,$bb);
+});
+
+socketio.on("passwordreq",function(roomname){
+	var password = prompt("Password for room "+roomname+"?");
+	socketio.emit('joinroompwd', {'room':roomname,'pwd':password});
+});
+
+socketio.on("kickedtolobby",function(data){
+	socketio.emit("joinroom", 'lobby');
+		
+	selectedsuser = null;
+	$('#selecteduser').text('user');
+});
+
+socketio.on("bannedfromroom",function(data){
+	socketio.emit("addbannedfromroom", data);
 });
 
 socketio.on("message_to_client",function(data) {

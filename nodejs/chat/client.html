@@ -10,6 +10,7 @@
 	</head>
 	
 	<body>
+		<div id="chatroomheader">CHATROOM</div>
 		<div id="input">
 			<input type="text" id="text_input"/>
 			<button id="sendmessage">send</button>
@@ -17,13 +18,14 @@
 			<button id="createroom">create</button>
 			<input type="password" id="password_input" maxlength="16" size="8"/>
 		</div><hr>
-		<div id="chatrooms">Chatrooms:<br>
+		<div id="chatrooms"><span class="listheader">Chatrooms: </span><br>
 			<span id="chatroomslist"></span>
 			<span id="currentroom"></span>
 		</div><hr>
-		<div id="roomusers">Roomusers:<br>
+		<div id="roomusers"><span class="listheader">Roomusers: </span><br>
 			<span id="roomuserslist"></span>
-		</div><hr>
+		</div>
+		<div id="select">Selected User: <span id="selecteduser"></span></div><hr>
 		<div id="chatlogs"></div>
 	</body>
 </html>
