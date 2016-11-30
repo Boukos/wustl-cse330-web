@@ -1,0 +1,20 @@
+/* app css stylesheet */
+
+#main {
+	font-family:Times,Arial;
+	font-size:20pt;
+}
+
+p {
+	line-height: 20px;
+	font-weight:bold;
+}
+
+th, td {
+	text-align: left;
+	padding: 10px
+}
+
+tr:nth-child(even){
+	background-color: #f0f0f0
+}
