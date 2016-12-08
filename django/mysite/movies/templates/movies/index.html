@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Movies</title>
+	<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
+</head>
+
+<body>
+<div id="header">
+  <div id="branding"><h1>Movie list</h1></div>
+</div>
+
+{% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}. Thanks for logging in. <a href={% url 'logout' %}>Log out</a></p>
+{% else %}
+    <p>Welcome, guest. Please <a href={% url 'login' %}>Log in</a>. Or you can 
+	<a href={% url 'register' %}>New user register</a>
+	</p>
+{% endif %}
+<hr>
+
+<div id='recommendations'>
+	<h2>Recommended for you:</h2>
+	<table>
+	<tr>
+	{% for movie in max_movie_list %}
+        <td>
+		<a href="{% url 'movies:detail' movie.id %}">{{ movie.movie_title }}</a><br>
+		<img src={{movie.movie_cover}} alt='cover' width=100 height=100>
+		</td>
+	{% endfor %}
+	{% for movie in personal_movie_list %}
+        <td>
+		<a href="{% url 'movies:detail' movie.id %}">{{ movie.movie_title }}</a><br>
+		<img src={{movie.movie_cover}} alt='cover' width=100 height=100>
+		</td>
+	{% endfor %}
+	</tr>
+	</table>
+</div>
+<hr>
+
+<form action="{% url 'movies:index' %}" method="post">
+{% csrf_token %}
+	<button type="submit" name='orderby' value="movie_title">Name</button>
+	<button type="submit" name='orderby' value="pub_date" >Date</button>
+	<button type="submit" name='orderby' value="-avgrating">Top Rating</button>
+</form>
+
+{% if limited_movie_list %}
+	<table>
+	<thead>
+		<tr>
+		<th>Title</th><th>Date</th><th>Ratings</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+    {% for movie in limited_movie_list %}
+		<tr>
+        <td><a href="{% url 'movies:detail' movie.id %}">{{ movie.movie_title }}</a></td>
+		<td>{{ movie.pub_date }}</td>
+		<td>{{ movie.avgrating }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+{% else %}
+    <p>No movies are available.</p>
+{% endif %}
+
+<form action="{% url 'movies:search' %}" method="post">
+{% csrf_token %}
+	<input type="text" name='searchcontent' value=''>
+	<button type="submit" value="search">Search Movie!</button>
+</form>
+
+</body>
+</html>

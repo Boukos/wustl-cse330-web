@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Detail</title>
+	<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
+</head>
+
+<body>
+<div id="header">
+  <div id="branding"><h1><strong>{{ movie.movie_title }}</strong></h1></div>
+</div>
+
+<a href="{% url 'movies:index' %}">Return to movie list</a>
+{% if error_message %}
+	<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<div id='movieinfo'>
+<p><img src={{movie.movie_cover}} alt='cover'></p>
+<p>Director: {{movie.director}} | Date: {{movie.pub_date}}</p>
+<p><strong>Average Rating: {{movie.avgrating}}</strong></p>	
+</div><br>
+<hr><br>
+
+{% if user.is_authenticated %}
+<div id='movierating'>
+<form action="{% url 'movies:rate' movie.id %}" method="post">
+{% csrf_token %}
+<style type="text/css">
+    .fieldset-auto-width {display: inline-block;}
+</style>
+<fieldset class="fieldset-auto-width">
+	<legend><h2>Rate this movie:</h2></legend>
+	<!--Rating: <input type="number" name="rating" min="1" max="10" />-->
+	<label for="rangeinput">Rating</label> 
+	<input id="rangeinput" type="range" name="rating" min="0" max="10" value="5" onchange="rangevalue.value=value"></input> 
+	<output id="rangevalue">5</output><br>
+	Comment: <br>
+	<textarea name="comment" rows="5" cols="40"></textarea><br>
+	<input type="submit" value="Rate" />
+</fieldset>
+</form>
+{% endif %}
+
+{% if movie.rating_set %}
+    <ul>
+    {% for rating in movie.rating_set.all%}
+        <li>{{ rating.rate_user }}, {{ rating.intrating }}, {{ rating.comment }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No ratings are available.</p>
+{% endif %}
+</div>
+
+</body>
+</html>

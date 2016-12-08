@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Register</title>
+	<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
+</head>
+
+<body>
+{% block title %}Movies Registration{% endblock %}
+
+{% block content %}
+  <div id="header">
+	<div id="branding"><h1>Registration</h1></div>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create User</button>
+  </form>
+{% endblock %}
+
+<a href="{% url 'movies:index' %}">Return to movie list</a>
+</body>
+</html>
