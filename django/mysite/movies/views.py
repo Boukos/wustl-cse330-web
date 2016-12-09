@@ -22,12 +22,15 @@ def index(request):
 	max_rating = Movie.objects.all().aggregate(Max('avgrating')).values()[0]
 	max_movie_list = Movie.objects.filter(avgrating=max_rating) #[:3]
 	# personal
-	user_name = request.user.username
-	user_ratings = Rating.objects.filter(rate_user=user_name)
-	max_user_rating = user_ratings.aggregate(Max('intrating')).values()[0]
-	user_genre = user_ratings.filter(intrating=max_user_rating)[0].movie.movie_genre
-	recommend = Movie.objects.filter(movie_genre=user_genre).order_by('avgrating')[:1]
-	
+	recommend = []
+	if request.user.is_authenticated():
+		user_name = request.user.username
+		user_ratings = Rating.objects.filter(rate_user=user_name)
+		if user_ratings:
+			max_user_rating = user_ratings.aggregate(Max('intrating')).values()[0]
+			user_genre = user_ratings.filter(intrating=max_user_rating)[0].movie.movie_genre
+			recommend = Movie.objects.filter(movie_genre=user_genre).order_by('avgrating')[:1]
+
 	context = {
 		'limited_movie_list': limited_movie_list,
 		'max_movie_list': max_movie_list,
