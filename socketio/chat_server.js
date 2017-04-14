@@ -1,171 +1,175 @@
 // Require the packages we will use:
 var http = require("http"),
+	url = require('url'),
+	path = require('path'),
 	socketio = require("socket.io"),
-	fs = require("fs");
+	fs = require("fs"),
 	express = require('express');
 
-// Server setup using express
+// Server setup using express for css and js
+// https://expressjs.com/en/starter/static-files.html
 var appexp = express();
 var app = http.createServer(appexp);
-appexp.use(express.static('public'))
+appexp.use(express.static('client'));
 appexp.get('/',function(req,res){
 	res.sendFile(__dirname + '/client.html'); // index.html
 });
 app.listen(3456);
 
 
-// Chatroom variables
-var usernames = [];
-var chatrooms = [];
-var useridnames = {'serverid':'server'};
-var usernewnameid = {};
-var useridrooms = {'serverid':'lobby'};
-var usersinroom = {'lobby':{'serverid':true}};
-var roompwd = {'lobby':''};
-
 // Do the Socket.IO magic:
 var io = socketio.listen(app);
 
+var users = {"SERVER":1} // socket.id: username
+var rooms = {"LOBBY":["SERVER"]} // roomname: list of users
+var roompwds = {"LOBBY":""} // roomname: room password
+
 // This callback runs when a new Socket.IO connection is established.
 io.sockets.on("connection", function(socket){
+	// socket.name: username
+	// socket.loc: user location
+	
+	socket.on('newconnection', function(username){
+		// update globals
+		if (username === 'guest'){
+			randomizer = Math.floor((Math.random() * 1000) + 1)
+			username = username+randomizer.toString();
+		}
+		users[username] = socket.id;
+		rooms["LOBBY"].push(username);
+		// update socket info
+		socket.name = username;
+		socket.loc = "LOBBY";
+		socket.bannedFrom = [];
+		// join lobby channel
+		socket.join("LOBBY");
+		
+		console.log("new user: "+username);
+		
+		// update chatrooms to this socket
+		roomlist = Object.keys(rooms);
+		console.log(roomlist);
+		socket.emit("roomlist",roomlist);
+		// update users to all sockets
+		userlist = rooms["LOBBY"];
+		console.log(userlist);
+		io.to('LOBBY').emit("userlist",userlist);
+		
+		// emit notification
+		io.to('LOBBY').emit("message_to_client",{
+			message: "Welcome "+username , 
+			user: "SERVER"
+		});
+	});
+	
+	socket.on('disconnect', function(){
+		console.log(socket.name+" "+"left");
+		// update users, rooms
+		delete users[socket.name];
+		// http://stackoverflow.com/questions/5767325/how-to-remove-a-particular-element-from-an-array-in-javascript
+		var index = rooms[socket.loc].indexOf(socket.name);
+		if (index > -1) {
+			rooms[socket.loc].splice(index, 1);
+		}
+		// broadcast new userlist
+		userlist = rooms[socket.loc];
+		io.to(socket.loc).emit("userlist",userlist);
+	});
 	
 	socket.on('message_to_server', function(data) {
 	// This callback runs when the server receives a new message from the client.
-		console.log("message: "+ data["message"]);
 		mes = data["message"];
+		console.log("message: "+ mes);
 		
-		// check @user
-		var results = mes.match(/@[\w]+/);
-		if (results!=null){ 
-			var atuser=results[0].match(/[\w]+/)[0];
-			userid = usernewnameid[atuser];
-			io.to(userid).emit("message_to_client",{
-				message:mes,
-				user:"@YOU: "+useridnames[socket.id]}) 
-		}
-		
-		// censor
-		var filterWords = ["shit", "fuck", "ass"];
-		var rgx = new RegExp("("+filterWords.join("|")+")", "gi");
-		mes = mes.replace(rgx, "***");
+		// Creative
+		// filter words
+		mes = filterMessage(mes)
 		
 		// io.sockets.emit
 		io.to(socket.loc).emit("message_to_client",{
 			message:mes,
-			user:useridnames[socket.id] 
-		}) 
-	});
-	
-	socket.on('newuser', function(username){
-		useridnames[socket.id] = username;
-		socket.name = username;
-		socket.loc = 'lobby'; //socket.room
-		usersinroom['lobby'][socket.id]=true;
-		socket.join('lobby');
-		
-		console.log("new user: "+username);
-		// update chatrooms to this socket
-		chatrooms = getValues(useridrooms);
-		socket.emit("chatrooms",chatrooms);
-		// update users to all sockets
-		//usernames = getValues(useridnames); // all users
-		userids = getKeys(usersinroom['lobby'])
-		usernames = getUsernames(userids);
-		io.to('lobby').emit("roomusers",usernames);
-		// emit notification
-		io.to('lobby').emit("message_to_client",{
-			message: "Welcome " + username , 
-			user:"SERVER"
-		});
-		socket.banned = {};
-	});
-	
-	socket.on('disconnect', function(){
-		console.log(useridnames[socket.id] + " " + "left");
-		delete useridnames[socket.id];
-		delete usernewnameid[socket.name];
-		delete (usersinroom[socket.loc])[socket.id];
-		userids = getKeys(usersinroom[socket.loc]);
-		usernames = getUsernames(userids);
-		io.to(socket.loc).emit("roomusers",usernames);
+			user:socket.name
+		})
 	});
 	
 	socket.on('changeusername', function(newusername) {
-		console.log('change name: '+ newusername);
+		console.log('change name: '+newusername);
 		var oldusername = socket.name;
 		
-		if(newusername in usernewnameid ){
-			if(usernewnameid[newusername] === socket.id){
-				delete usernewnameid[oldusername];
-				usernewnameid[newusername] = socket.id;
-			
-				socket.name = newusername;
-				useridnames[socket.id] = newusername;
-				delete usersinroom[socket.loc][oldusername];
-				usersinroom[socket.loc][socket.id] = true;
-				
-				userids = getKeys(usersinroom[socket.loc]);
-				usernames = getUsernames(userids);
-				io.to(socket.loc).emit("roomusers",usernames);
-			}
-			else{
-				io.to(socket.loc).emit("message_to_client",{
-					message:'name not available',
-					user:useridnames[socket.id] 
-				}) 
-			}
+		if(newusername in users ){
+			socket.emit("message_to_client",{
+				message:'Username not available',
+				user:"SERVER" 
+			})
 		}
 		else{
-			usernewnameid[newusername] = socket.id;
-			
 			socket.name = newusername;
-			useridnames[socket.id] = newusername;
-			delete usersinroom[socket.loc][oldusername];
-			usersinroom[socket.loc][socket.id] = true;
+			users[socket.name] = socket.id;			
+			delete users[oldusername];
 			
-			userids = getKeys(usersinroom[socket.loc]);
-			usernames = getUsernames(userids);
-			io.to(socket.loc).emit("roomusers",usernames);
+			rooms[socket.loc].push(socket.name);
+			var index = rooms[socket.loc].indexOf(oldusername);
+			if (index > -1) {
+				rooms[socket.loc].splice(index, 1);
+			}
+			
+			usernames=rooms[socket.loc]
+			io.to(socket.loc).emit("userlist",usernames);
 		}
 	});
 	
 	socket.on('createroom', function(roomdata) {
-		// leaving
+		
 		newroomname = roomdata["room"];
 		newroompwd = roomdata["pwd"];
 		console.log('create room: '+ newroomname+' '+newroompwd);
-		socket.leave(socket.loc);
-		delete (usersinroom[socket.loc])[socket.id];
-		io.to(socket.loc).emit("message_to_client",{
-			message: socket.name + " left " + socket.loc , 
-			user:"SERVER"
-		});
-		usernames = getUsernames(getKeys(usersinroom[socket.loc]));
-		io.to(socket.loc).emit("roomusers",usernames);
 		
-		// creating and joining
-		socket.join(newroomname);
-		useridrooms[socket.id] = newroomname; // register user's room
-		roompwd[newroomname] = newroompwd;
-		chatrooms = getValues(useridrooms);
-		io.sockets.emit("chatrooms",chatrooms); // update rooms
-		socket.loc = newroomname;
-		usersinroom[socket.loc] = {};
-		usersinroom[socket.loc][socket.id] = true;
-		
-		io.to(socket.loc).emit("message_to_client",{
-			message: socket.name + " joined " + socket.loc , 
-			user:"SERVER"
-		});	
-		chatrooms = getValues(useridrooms);
-		socket.emit("chatrooms",chatrooms);
-		userids = getKeys(usersinroom[socket.loc]);
-		usernames = getUsernames(userids);
-		io.to(socket.loc).emit("roomusers",usernames);
+		if (newroomname in rooms){
+			socket.emit("message_to_client",{
+				message:'Roomname not available',
+				user:"SERVER" 
+			})
+		}
+		else{
+			// leave current room
+			var index = rooms[socket.loc].indexOf(socket.name,1);
+			if (index > -1) {
+				rooms[socket.loc].splice(index, 1);
+			}
+			socket.leave(socket.loc);
+			
+			io.to(socket.loc).emit("message_to_client",{
+				message: socket.name + " lefts " + socket.loc , 
+				user:"SERVER"
+			});
+			
+			usernames = rooms[socket.loc];
+			io.to(socket.loc).emit("userlist",usernames);
+			
+			// creating and joining
+			rooms[newroomname] = [];
+			rooms[newroomname].push(socket.name); // 0 for owner
+			rooms[newroomname].push(socket.name); // join room
+			roompwds[newroomname] = newroompwd;
+			
+			socket.join(newroomname);
+			socket.loc = newroomname;
+			
+			io.to(socket.loc).emit("message_to_client",{
+				message: socket.name + " joined " + socket.loc , 
+				user:"SERVER"
+			});	
+			
+			chatrooms = Object.keys(rooms);
+			io.sockets.emit("roomlist",chatrooms);
+			usernames = rooms[socket.loc];
+			io.to(socket.loc).emit("userlist",usernames);
+		}
 	});
 	
 	socket.on('joinroom', function(roomname) {
-		if(socket.banned[roomname]){
+		
+		if(socket.bannedFrom.indexOf(roomname) != -1){
 			socket.emit('message_to_client', {
 				message:"Banned from "+roomname,
 				user:("SERVER")
@@ -173,76 +177,74 @@ io.sockets.on("connection", function(socket){
 			return;
 		}
 		
-		if (roompwd[roomname]==""){
-			// leaving
-			console.log(socket.name + ' joined room: ' + roomname);
+		if (roompwds[roomname]=="" || rooms[roomname][0]===socket.name){
+			// leave current room
+			var index = rooms[socket.loc].indexOf(socket.name,1);
+			if (index > -1) {
+				rooms[socket.loc].splice(index, 1);
+			}
 			socket.leave(socket.loc);
-			delete (usersinroom[socket.loc])[socket.id];
+			
 			io.to(socket.loc).emit("message_to_client",{
-				message: socket.name + " left " + socket.loc , 
+				message: socket.name + " lefts " + socket.loc , 
 				user:"SERVER"
 			});
-			userids = getKeys(usersinroom[socket.loc]);
-			usernames = getUsernames(userids);
-			io.to(socket.loc).emit("roomusers",usernames);
+			
+			usernames = rooms[socket.loc];
+			io.to(socket.loc).emit("userlist",usernames);
 			
 			// no creating just joining
 			socket.join(roomname);
-			// useridrooms[socket.id] = newroomname; // register user's room
 			socket.loc = roomname;
-			// usersinroom[socket.loc] = {};
-			usersinroom[socket.loc][socket.id] = true;
+			rooms[roomname].push(socket.name); // register in room
 			
 			io.to(socket.loc).emit("message_to_client",{
-				message: socket.name + " joined " + socket.loc , 
+				message: socket.name+" joined "+socket.loc , 
 				user:"SERVER"
 			});	
-			chatrooms = getValues(useridrooms);
-			socket.emit("chatrooms",chatrooms);
-			userids = getKeys(usersinroom[socket.loc]);
-			usernames = getUsernames(userids);
-			io.to(socket.loc).emit("roomusers",usernames);
+			
+			usernames = rooms[socket.loc];
+			io.to(socket.loc).emit("userlist",usernames);
 		}
 		else{
-			socket.emit("passwordreq",roomname);
+			socket.emit("pwdreq",roomname);
 		}
-	});	
-
+	});
+	
 	socket.on('joinroompwd', function(data) {
 		roomname = data['room'];
 		password = data['pwd'];
-		if (roompwd[roomname]==password){
-			// leaving
-			console.log(socket.name + ' joined room: ' + roomname);
+		if (roompwds[roomname]==password){
+			// leave current room
+			var index = rooms[socket.loc].indexOf(socket.name,1);
+			if (index > -1) {
+				rooms[socket.loc].splice(index, 1);
+			}
 			socket.leave(socket.loc);
-			delete (usersinroom[socket.loc])[socket.id];
+			
 			io.to(socket.loc).emit("message_to_client",{
-				message: socket.name + " left " + socket.loc , 
+				message: socket.name + " lefts " + socket.loc , 
 				user:"SERVER"
 			});
-			userids = getKeys(usersinroom[socket.loc]);
-			usernames = getUsernames(userids);
-			io.to(socket.loc).emit("roomusers",usernames);
+			
+			usernames = rooms[socket.loc];
+			io.to(socket.loc).emit("userlist",usernames);
 			
 			// no creating just joining
 			socket.join(roomname);
-			// useridrooms[socket.id] = newroomname; // register user's room
 			socket.loc = roomname;
-			// usersinroom[socket.loc] = {};
-			usersinroom[socket.loc][socket.id] = true;
+			rooms[roomname].push(socket.name); // register in room
 			
 			io.to(socket.loc).emit("message_to_client",{
-				message: socket.name + " joined " + socket.loc , 
+				message: socket.name+" joined "+socket.loc , 
 				user:"SERVER"
 			});	
-			chatrooms = getValues(useridrooms);
-			socket.emit("chatrooms",chatrooms);
-			userids = getKeys(usersinroom[socket.loc]);
-			usernames = getUsernames(userids);
-			io.to(socket.loc).emit("roomusers",usernames);
+			
+			usernames = rooms[socket.loc];
+			io.to(socket.loc).emit("userlist",usernames);
 		}
 		else{
-			io.to(socket.loc).emit("message_to_client",{
+			socket.emit("message_to_client",{
 				message:"Wrong password",
 				user:"SERVER" 
 			});
@@ -250,23 +252,23 @@ io.sockets.on("connection", function(socket){
 	});
 	
 	socket.on('whisperto', function(data) {	
-		username = data["user"];
+		user = data["user"];
 		mes = data["message"];
-		userid = usernewnameid[username];
+		userid = users[user];
 		io.to(userid).emit('message_to_client', {
 			message:mes,
-			user:("WHISPER: "+useridnames[socket.id])
+			user:("WHISPER FROM "+socket.name)
 		});
 	});
 	
 	socket.on('kickuser', function(data) {	
-		username = data;
-		roomname = socket.loc;
+		user = data;
+		room = socket.loc;
 		
-		if(useridrooms[socket.id]===roomname){
-			userid = usernewnameid[username];
+		if(rooms[socket.loc][0] === socket.name){
+			userid = users[user];
 			io.to(userid).emit('message_to_client', {
-				message:'kicked from '+roomname,
+				message:'Kicked from '+room,
 				user:('SERVER')
 			});
 			io.to(userid).emit('kickedtolobby', 'kicked');
@@ -276,21 +278,21 @@ io.sockets.on("connection", function(socket){
 				message:"No permission",
 				user:("SERVER")
 			});
-		}
-		
+		}	
 	});
 	
 	socket.on('banuser', function(data) {	
-		username = data;
-		roomname = socket.loc;
-		if(useridrooms[socket.id]===roomname){
-			userid = usernewnameid[username];
+		user = data;
+		room = socket.loc;
+		
+		if(rooms[socket.loc][0] === socket.name){
+			userid = users[user];
 			io.to(userid).emit('message_to_client', {
-				message:'banned from '+roomname,
+				message:'banned from '+room,
 				user:('SERVER')
 			});
 			io.to(userid).emit('kickedtolobby', 'kicked');
-			io.to(userid).emit('bannedfromroom', roomname);
+			io.to(userid).emit('bannedfromroom', room);
 		}
 		else{
 			socket.emit('message_to_client', {
@@ -301,30 +303,17 @@ io.sockets.on("connection", function(socket){
 	});
 	
 	socket.on('addbannedfromroom', function(data) {
-		socket.banned[data] = true;
-		console.log(socket.name+' banned from '+data);
+		room = data;
+		socket.bannedFrom.push(room);
+		console.log(socket.name+' banned from '+room);
 	});
-})
+	
+});
 
-
-function getUsernames(ids) {
-	var names = [];
-	ids.forEach(function(key){
-		names.push(useridnames[key]);
-	});
-	return names;
+function filterMessage(msg){
+	// http://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+	var filterWords = ["shit", "fuck", "ass"];
+	var rgx = new RegExp("("+filterWords.join("|")+")", "gi");
+	msg = msg.replace(rgx, "***");
+	return msg;
 }
-
-function getKeys(dict) {
-	var keys = Object.keys(dict);
-	return keys;
-}
-
-function getValues(dict) {
-	var vals = Object.keys(dict).map(function(key){
-		return dict[key];
-	});
-	return vals;
-}
-
-// eof

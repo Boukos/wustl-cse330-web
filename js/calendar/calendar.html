@@ -1,54 +1,73 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Calendar</title>
-        <link rel="stylesheet" type="text/css" href="calendar.css"/>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-		<script type="text/javascript" src="calendar.js"> </script>
-    </head>
-    <body>
-        <div id="login">
-			Welcome, guest.
-            <input type="text" id="username" />
-            <input type="password" id="password" />
-            <input value="login" type="submit" id="loginbtn" />
-            <input value="register" type="submit" id="register" />
-        </div>
-		<div id="logout">
-			Welcome!<span id="currentUser"></span>
-			<input value="logout" type="submit" id="logoutbtn" />
-		</div>
+<head>
+	<meta charset="utf-8"/>
+	<title>Calendar</title>
+	<link rel="stylesheet" type="text/css" href="calendar.css"/>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+	<script type="text/javascript" src="calendar.js"></script>
+</head>
 
-        <div id="main">
-			<div id="calendar-head">
-                <button id="prevMonthBtn">Prev</button>
-                <span id="calendar-month"></span>
-                <button id="nextMonthBtn">Next</button>
-            </div>
-            <div id="calendar-body"></div>
+<body>
+
+	<div id="user">
+		<div id="logindiv">
+			Welcome, Guest.
+			Username:<input type="text" id="usernameinput" />
+			Password:<input type="password" id="passwordinput" />
+			<input id="loginbutton" type="submit" value="login" />
+			<input id="registerbutton" type="submit" value="register" />
+		</div>
+		<div id="logoutdiv">
+			Welcome!<span id="username"></span>.
+			<button id="profileButton">Profile</button>
+			<input value="logout" type="submit" id="logoutbutton" />
+		</div>
+	</div>
+
+	<div id="calendar">
+		<div id="calendarhead">
+			<button id="lastmonth">&lt;=</button>
+			<span id="calendarmonth"></span>
+			<button id="nextmonth">=></button>
+		</div>
+		<div id="calendarbody"></div>
 		
-			<div id="add-event-div">
-				<form id="add-event">
-					<span><label>Time </label><input type ="number" id="hrs" min="0" max="23" size="2">
-					:<input type ="number" id="mins" min="0" max="59" size="2"></span>
-					<span><label>Event </label><input type = "text" value = "" class = "listened" id = "content"></span>
-					<span><label>Tag </label><select id="event-tag-select"></select></span>
-					<input value="Add" type="button" id="addEventBtn" />
-					<input value="" type="text" id="sharedUser" size="8"/>
-					<input value="Share" type="button" id="shareEventBtn" />
-					
-				</form>
-			</div>
-			<div id="tag-toggle"></div>	
-        </div>
+		<div id="calendartags"></div>
 		
-        <div id="detail-panel">            
-            <div id="detail-header"></div>
-            <div id="detail-body">
-                <div id="event-list"></div>
-            </div>
-            <div id="detail-footer"></div>
-        </div>
-		
-    </body>
+		<div id="addeventdiv">
+			<form id="addevent">
+				<span>Time <input type ="number" id="hour" min="0" max="23" size="2">
+				:<input type ="number" id="minute" min="0" max="59" size="2"></span>
+				<span>Event <input type="text" id="eventinput"></span>
+				<span>Tag <select id="eventtagselect"></select></span>
+				<input type="button" value="Add" id="addEventButton" />
+				<!--input type="button" value="test" id="testbutton" /-->
+			</form>
+		</div>
+	
+	</div>
+	
+	<div id="events">
+		<ul id="eventlist"></ul>
+	</div>
+	
+	
+	<!-- // https://www.w3schools.com/howto/howto_css_modals.asp -->
+	<div id="myModal" class="modal">
+	  <div class="modal-content">
+		<span class="closemodal">&times;</span>
+		<p>Event Edit</p>
+		<form id="editevent">
+			<span>Time <input type ="number" id="houre" min="0" max="23" size="2">
+			:<input type ="number" id="minutee" min="0" max="59" size="2"></span>
+			<span>Event <input type="text" id="eventinpute"></span>
+			<span>Tag <select id="eventtagselecte"></select></span>
+			<input type="button" value="Submit Edit Event" id="editEventButton" />
+			<input type="hidden" id="eventide" />
+		</form>
+	  </div>
+	</div>
+	
+</body>
 </html>

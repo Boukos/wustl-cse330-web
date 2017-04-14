@@ -1,54 +1,54 @@
 <?php
-error_reporting(0);
-
-if(empty($_SESSION))
-{
-	ini_set("session.cookie_httponly", 1);
-	session_start();
-}
-
-if( !(isset($_SESSION['token']) and $_SESSION['token']==$_POST['token']) ){
-	echo json_encode(array(
-		"success"=>false,
-		"message"=>"Request forgery detected"));
-	exit;
-}
-
-include 'function.php';
 header("Content-Type: application/json");
+ini_set("session.cookie_httponly", 1);
 
-if(!isset($_SESSION['username'])){
+// Content of database.php
+$mysqli = new mysqli('localhost', 'wustl_inst', 'wustl_pass', 'calendar');
+if($mysqli->connect_errno) {
+	echo json_encode(array(
+		"success" => false,
+		"message" => "Connection Failed: %s\n", $mysqli->connect_error
+	));
 	exit;
 }
 
-$username = $_SESSION['username'];
+session_start();
+$user_id=$_SESSION['userid'];
+$time1 = $_POST['time'];
+$time2= $_POST['timeend'];
 
-$user_id = getUserId($username);
-$events = getEvents($user_id);
-
-$my_array = array();
-$lastDate = null;
-$tempArray = null;
-// $event_id,$content,$timestamp,$tag
-foreach($events as $event){
-	$dateString = strtotime($event[2]);
-	$date = date("Y-m-d",$dateString);
-	$time = date("H:i",$dateString);
-	if($date != $lastDate){
-		if($tempArray != null){
-			$my_array[$lastDate] = $tempArray;
-		}
-		$lastDate = $date;
-		$tempArray = array();
-	}
-	array_push($tempArray, array(
-		"id"=>$event[0],
-		"title"=>htmlentities($event[1]),
-		"time"=>$time,
-		"tag_id"=>$event[3]
-		));
+//$stmt = $mysqli->prepare("select time, tag_id, content from events order by time where user_id=? and time>=? and time<=?");
+$stmt = $mysqli->prepare("select event_id,content,time,tag_id from events where user_id=$user_id and time>'$time1' and time<'$time2'");
+if(!$stmt){
+	echo json_encode(array(
+		"success" => false,
+		"message" => "Query Prep Failed: %s\n", $mysqli->error
+	));
+	exit;
 }
-$my_array[$lastDate] = $tempArray;
-echo json_encode($my_array);
-exit;
+$stmt->execute();
+$stmt->bind_result($event_id,$content,$time,$tag_id);
+
+$events = array();
+while($stmt->fetch()){
+	$safe_event_id = htmlentities($event_id);
+	$safe_content = htmlentities($content);
+	$safe_time = htmlentities($time);
+	$safe_tag_id = htmlentities($tag_id);
+	$event = array(
+		"event_id" => $event_id,
+		"content" => $content,
+		"time" => $time,
+		"tag_id" => $tag_id
+	);
+	array_push($events,$event);
+}		
+$stmt->close();
+
+echo json_encode(array(
+	"success" => true,
+	"events" => $events
+));
+exit; 
+
 ?>

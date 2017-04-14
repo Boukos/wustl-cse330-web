@@ -1,18 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>News Delete</title>
+	<link rel="stylesheet" type="text/css" href="news.css">
+</head>
+
+<body>
+	<h1>Delete</h1>
 <?php
-	require 'database.php';
- 
-	$id= $_POST['story_id'];
-	
-	$stmt = $mysqli->prepare("DELETE FROM stories WHERE stories.id=?");
-  	if(!$stmt){
-		printf("Query Prep Failed: %s\n", $mysqli->error);
-		exit;
-	  }
-
-$stmt->bind_param('s', $id);
-$stmt->execute();
-$stmt->close();
-
-echo "Success!<br>";
-echo "<a href=\"news_express.php\">Return to news</a>";
+	session_start();
+	echo "<strong>You are going to delete this news.</strong>";
+	$story_id= $_POST["story_id"];
+	printf(
+		"<form method=\"POST\" action=\"news_handler.php\">
+		<input type=\"submit\" value=\"continue\"/>
+		<input type=\"hidden\" name=\"story_id\" value= %s>	
+		<input type=\"hidden\" name=\"operation\" value= \"delete\"> 
+		<input type=\"hidden\" name=\"token\" value=%s />
+		</form><br /><br />"
+		,$story_id,$_SESSION['token']);
+	echo "<a href=\"news_list.php\">Return to news</a>";
 ?>
+	
+</body>
+
+</html>

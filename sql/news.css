@@ -1,0 +1,24 @@
+body{background-color:tan}
+
+#main{
+	font-family:Arial, Times new Roman;	
+	font-size:10pt;
+}
+
+h1{
+	font-family:Arial, Times new Roman;
+	font-size:50pt;
+	text-shadow:2px 2px yellow;
+	font-style:italic;
+}
+p{
+	font-family:Arial, Times new Roman;	
+	font-size:20pt;
+}
+img{
+	display:block;
+	margin:auto
+}
+form {
+    display: inline-block;
+}

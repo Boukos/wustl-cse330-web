@@ -1,0 +1,28 @@
+/* app css stylesheet */
+
+#main {
+	font-family:Arial,Times;
+	font-size:20pt;
+}
+
+#backToHome {
+	line-height: 10px;
+}
+
+a {
+	line-height: 10px;
+}
+
+p {
+	line-height: 10px;
+	font-weight: bold;
+}
+
+th, td {
+	text-align: left;
+	padding: 20px
+}
+
+tr:nth-child(even){
+	background-color: #A67B5B
+}

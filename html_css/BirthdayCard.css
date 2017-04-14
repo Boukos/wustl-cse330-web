@@ -1,0 +1,22 @@
+
+body {background-color: #90CEE0;}
+
+p	{
+	font-family:Fantasy,Arial;
+	font-size:60pt;
+	
+	text-align:center;
+	text-shadow: 4px 4px red;
+	color:purple;
+	line-height: 12px;
+	}
+p.i {
+	font-style:italic;
+	font-size:80pt;}
+p.b {font-weight:bold;}
+
+img.displayed {
+	display: block;
+	margin-left: auto;
+	margin-right: auto }
+	

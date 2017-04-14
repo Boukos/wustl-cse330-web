@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-
 <html>
-   <head>
-		<title>chat</title>
-		<link rel="stylesheet" type="text/css" href="client.css"/>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Chatroom</title>
 		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 		<script type="text/javascript" src="client.js"></script>
+		<link rel="stylesheet" type="text/css" href="client.css"/>
 	</head>
 	
 	<body>
-		<div id="chatroomheader">CHATROOM</div>
+		<h1>CHATROOM</h1>
 		<div id="input">
-			<input type="text" id="text_input"/>
-			<button id="sendmessage">send</button>
-			<button id="changeusername">change</button>
-			<button id="createroom">create</button>
-			<input type="password" id="password_input" maxlength="16" size="8"/>
-		</div><hr>
-		<div id="chatrooms"><span class="listheader">Chatrooms: </span><br>
-			<span id="chatroomslist"></span>
-			<span id="currentroom"></span>
-		</div><hr>
-		<div id="roomusers"><span class="listheader">Roomusers: </span><br>
-			<span id="roomuserslist"></span>
+			<input id="textInput" type="text" />
+			<button id="sendButton">send</button>
+			<button id="changeButton">change</button>
+			<button id="createButton">create</button>
+			Password:<input type="password" id="passwordInput" maxlength="16" size="8"/>
 		</div>
-		<div id="select">Selected User: <span id="selecteduser"></span></div><hr>
-		<div id="chatlogs"></div>
+		<div id="stat">
+			<label>Room: <span id="currentroom"></span></label>
+			<label>Username: <span id="currentname"></span></label>
+			<label>Selected: <span id="currentuser"></span></label>
+		</div><hr>
+		<div id="rooms">
+			<h2>Chatrooms (Click to join!)</h2>
+			<span id="roomlist"></span>
+		</div><hr>
+		<div id="users">
+			<h2>Roomusers (Click to select!)</h2>
+			<span id="userlist"></span>
+		</div><hr>
+		<div id="logs">
+			<span><b>Chatlogs</b><button id="clearButton">clear</button></span>
+			<table id="chatlogs"></table>
+		</div>
 	</body>
 </html>

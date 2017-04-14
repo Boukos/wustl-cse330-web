@@ -1,0 +1,21 @@
+body { 
+    background-color: #A7DCEB;
+}
+
+#main{
+    float: left;
+}
+
+h1 {
+	line-height: 60%;
+	text-align: left;
+	text-shadow: 2px 2px blue;
+	font-family:Times,Arial;
+}
+
+h2 {
+	line-height: 40%;
+	text-align: left;
+	text-shadow: 1px 1px cyan;
+	font-family:Times,Arial;
+}

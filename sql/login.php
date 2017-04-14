@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>News Login</title>
+	<link rel="stylesheet" type="text/css" href="news.css"/>
+</head>
+
+<body>
+	<h1>News</h1>
 <?php
 	$username = $_POST['username'];
 	$pword = $_POST['password'];
@@ -11,9 +21,8 @@
 		exit;
 	}
 	
-	// read user list
-	require 'database.php';
-
+	// check login
+	require 'mysqli.php';
 	$stmt = $mysqli->prepare("select username from users");
 	if(!$stmt){
 		printf("Query Prep Failed: %s\n", $mysqli->error);
@@ -22,41 +31,41 @@
 	$stmt->execute();
 	$result = $stmt->get_result();
 	
-	$userexists = false;
+	// Check user and pwd
+	$userfound = false;
 	while($row = $result->fetch_assoc()){
 		if($row["username"]==$username){
-			$userexists = true;
-			// Use a prepared statement
-			$stmt = $mysqli->prepare("SELECT userid, userhpw, usersalt FROM users WHERE username=?");
+			$userfound = true;
+			$stmt = $mysqli->prepare("SELECT COUNT(*), userid, userhpw FROM users WHERE username=?");
 			// Bind the parameter
 			$stmt->bind_param('s', $username);
 			$stmt->execute();
 			// Bind the results
-			$stmt->bind_result($user_id, $pwd_hash, $user_salt);
+			$stmt->bind_result($cnt, $user_id, $pwd_hash);
 			$stmt->fetch();
 			// Compare the submitted password to the actual password hash
-			if( crypt($pword, $user_salt)==$pwd_hash){
+			if( $cnt == 1 && crypt($pword, $pwd_hash)==$pwd_hash){
 				// Login succeeded!
-				printf("<p>Hello, %s; how do you do?</p>",
-					htmlentities($username)
-				);
+				printf("<p>Hello, %s.</p>",	htmlentities($username)	);
 				session_start();
 				$_SESSION['username'] = $username;
 				$_SESSION['userid'] = $user_id;
+				// CSRF token
 				$_SESSION['token'] = substr(md5(rand()), 0, 10);
 				session_write_close();
-				echo '<a href="news_express.php">Continue to news</a>';
-				// Redirect to your target page
+				echo '<a href="news_list.php">Go to News</a><br />';
 			}else{
 				// Login failed; redirect back to the login screen
-				echo 'Wrong password!<br>';
+				echo 'Username or password incorrect!<br>';
 				echo '<a href="login.html">Return to login</a>';				
 			}
 		}
 	}	
 	
-	if(!$userexists) {
-		echo 'No such user!<br>';
+	if(!$userfound) {
+		echo 'User not found!<br>';
 		echo '<a href="login.html">Return to login</a>';
 	}
 ?>
+</body>
+</html>

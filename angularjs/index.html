@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="coffeeApp">
+<head>
+	<meta charset="utf-8">
+	<title>Coffee Review</title>
+	
+	<link rel="stylesheet" href="app.css">
+	
+	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-route/angular-route.js"></script>
+	
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"> 
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js" type="text/javascript"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js" type="text/javascript"></script>	
+	
+	<script src="app.js"></script>
+	<script src="coffees/coffees.js"></script>
+	<script src="reviews/reviews.js"></script>
+</head>
+
+<body>
+	<div id="main">
+		<span id="backToHome"><a href="#/coffees">Back to home</a></span>
+		<div ng-view></div>
+		<img src='./coffee.jpg' alt="CoffeeBeans">
+	</div>
+</body>
+</html>

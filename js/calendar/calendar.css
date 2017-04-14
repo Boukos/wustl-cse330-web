@@ -1,38 +1,28 @@
-header{
-    border-bottom: solid 1px #000;
-    position: relative;
-    left: 0;
-    top: 0;
-    height: 50px;
-    width: 100%;
-    padding: 0;
-}
+th, td {
+	border: 2px solid black;
+	vertical-align: top;
+	text-align: center;
+	height: 30px;
+    width: 100px;
+    //background: #eee;
+} 
 
-header input{
-    position: absolute;
-    right: 0;
-}
-
-#main{
-    float: left;
-}
-
-#calendar-head{
+#calendarhead{
     text-align: center;
 	padding: 10px 2px;
     width: 700px;
-    background: #1abc9c;
+    background: #6495ED;
 }
 
-#calendar-head span{
+#calendarhead span{
 	color: white;
     font-size: 20px;
     text-transform: uppercase;
     letter-spacing: 3px;
 }
 
-#calendar-head button{
-	background-color: #4CAF50; /* Green */
+#calendarhead button{
+	background-color: #ADD8E6; /* Green */
     border: none;
     color: white;
     padding: 15px 32px;
@@ -42,101 +32,59 @@ header input{
     font-size: 16px;
 }
 
-#calendar-head #calendar-month{
+#calendarhead #calendarmonth{
     font-size: 30px;
 }
 
-#wrapper{
-    margin: 0 auto;
+#calendarbody{
+    //margin: 0 auto;
     left: 0;
     right: 0;
     width: 700px;
-    min-height: 300px;
+    min-height: 280px;
 	
 	//border: 2px solid black;
 	vertical-align: top;
-	text-align: center;
+	//text-align: center;
 
     background: #eee;
 }
 
-th, td {
-	border: 2px solid black;
-	vertical-align: top;
-	text-align: center;
-	height: 40px;
-    width: 100px;
-    //background: #eee;
-} 
-
-#add-event-div{
-	text-align: center;
-	padding: 10px 2px;
-    width: 700px;
-	min-height: 25px;
-    background: #1abc9c;
-	//background: #999;
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-#add-event span{
-	color: white;
-    font-size: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
 }
 
-#add-event input[type=number]{
-	width = 20px;
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
 }
 
-#add-event #addEventBtn{
-	background-color: #4CAF50; /* Green */
-    //border: none;
-    color: white;
-    text-align: center;
+.close:hover,
+.close:focus {
+    color: black;
     text-decoration: none;
-    display: inline-block;
-    font-size: 15px;
+    cursor: pointer;
 }
 
-#add-event #shareEventBtn{
-	//background-color: #4CAF50; /* Green */
-    border: none;
-    //color: white;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 15px;
-}
-
-#add-event #sharedUser{
-	width: 50px;
-}
-
-#detail-panel{
-    /*display: none;*/
-    min-height: 440px;
-    width: 300px;
-    background: #efefef;
-    /*border: solid 1px #000;*/
-    float: left;
-    padding: 5px;
-    /*position: fixed;*/
-}
-
-#detail-panel .event{
-    margin: 5px 0;
-    border-bottom: solid 1px #ccc;
-    position: relative;
-}
-
-#detail-panel .event .event-action{
-    position: absolute;
-    display: inline-block;
-    right: 0;
-    bottom: 0;
-}
-
-#tag-toggle{
-    width: 700px;
-}

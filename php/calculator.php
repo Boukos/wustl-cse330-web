@@ -1,39 +1,45 @@
+<!DOCTYPE HTML>
+<head>
+	<meta charset="utf-8"/>
+	<title>Calculator</title>
+</head>
+
+<body>
 <?php
 
-$userName = $_GET["user"];
-$saniUserName = filter_var($userName, FILTER_SANITIZE_STRING);
-$num1 = (float)$_GET["num1"];
-$num2 = (float)$_GET["num2"];
-$add = $num1 + $num2;
-$sub = $num1 - $num2;
-$mul = $num1 * $num2;
-if($num2 != 0){
-	$div = $num1/$num2;
+if(!isset($_GET['calc'])){
+	echo "No specified calculation!";
 }
 else{
-	$div = "INFINITY!!";
-}
- 
-echo "hello"," ",$saniUserName;
-echo "<br>";
-
-if(!isset($_GET['symbol'])){
-	echo "No calculation specified!";
-}
-else{
-	$answer = $_GET['symbol'];
-	if ($answer == "add") {          
-		echo "$num1 + $num2 = $add";     
+	$answer = $_GET['calc'];
+	// filtering input
+	$number1 = (float)$_GET["num1"];
+	$number2 = (float)$_GET["num2"];
+	
+	if ($answer == "add") {
+		$add = $number1 + $number2;
+		echo "$number1 + $number2 = $add";     
 	}
-	elseif ($answer == "sub") {          
-		echo "$num1 - $num2 = $sub";     
+	elseif ($answer == "sub") {
+		$sub = $number1 - $number2;		
+		echo "$number1 - $number2 = $sub";     
 	}
-	elseif ($answer == "mul") {          
-		echo "$num1 * $num2 = $mul";     
+	elseif ($answer == "mul") {
+		$mul = $number1 * $number2;		
+		echo "$number1 * $number2 = $mul";     
 	}
-	elseif ($answer == "div") {          
-		echo "$num1 / $num2 = $div"; 
+	elseif ($answer == "div") {
+		if($number2 != 0){
+			$div = $number1/$number2;
+		}
+		else{
+			$div = "INFINITY";
+		}
+		echo "$number1 / $number2 = $div"; 
 	}
 }
 
 ?>
+
+</body>
+</html>
