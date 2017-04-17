@@ -1,0 +1,26 @@
+body {
+   font-family: Helvetica, Geneva, Arial, sans-serif;
+   font-size: small;
+   font-color: #000;
+   background-color: #fff;
+}
+
+a:link, a:active, a:visited {
+   color: #CD0000;
+}
+
+input { 
+   margin-bottom: 5px;
+}
+
+p { 
+   line-height: 150%;
+}
+ul {
+   width: 700px;
+   text-align: center;
+   padding: 5px;
+   background-color: #ececec;
+   border: 1px solid #ccc;
+   margin-bottom: 20px;
+}
